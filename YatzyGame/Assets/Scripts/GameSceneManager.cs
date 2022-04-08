@@ -8,9 +8,11 @@ public class GameSceneManager : UnityEngine.MonoBehaviour
 {
     PhotonManager photonManager;
     SceneLoadManager sceneLoadManager;
-    PhotonView myPhotonView;
     [SerializeField]
     Text[] nickNameText;
+
+    [SerializeField]
+    DiceRoller diceRoller;
 
     [SerializeField]
     Text debugText;
@@ -26,13 +28,10 @@ public class GameSceneManager : UnityEngine.MonoBehaviour
     {
         photonManager = PhotonManager.singleton;
         sceneLoadManager = SceneLoadManager.singleton;
-        myPhotonView = photonManager.myPhotonView;
         Debug.Log(PhotonNetwork.inRoom +" 인 룸");
         // myPhotonView.RPC("OnPlayerConnectRPC", PhotonTargets.AllViaServer);
         SetNickName();
     }
-
-
 
     public void SetNickName()
     {
@@ -45,16 +44,20 @@ public class GameSceneManager : UnityEngine.MonoBehaviour
         {
             //게임스타트
             debugText.text = PhotonNetwork.player.NickName + " 입니당";
+            if (PhotonNetwork.isMasterClient)
+            {
+                diceRoller.TurnChange(true);
+            }
+            else
+            {
+                diceRoller.TurnChange(false);
+                diceRoller.MasterStart();
+            }
+            
         }
         else
         {
             debugText.text = "아직 대기중이에요";
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

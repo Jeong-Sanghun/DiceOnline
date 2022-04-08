@@ -6,7 +6,6 @@ using Photon;
 public class PhotonManager : PunBehaviour
 {
     public static PhotonManager singleton;
-    public PhotonView myPhotonView;
 
     GameSceneManager gameSceneManager;
 
@@ -22,6 +21,7 @@ public class PhotonManager : PunBehaviour
             Destroy(gameObject);
         }
     }
+
 
     public void Join(string nickName)
     {
@@ -57,6 +57,7 @@ public class PhotonManager : PunBehaviour
 
     public override void OnPhotonPlayerConnected(PhotonPlayer newPlayer)
     {
+        Debug.Log("들어가따!");
         //myPhotonView.RPC("OnPlayerConnectRPC", PhotonTargets.AllViaServer);
         gameSceneManager.SetNickName();
     }

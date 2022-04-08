@@ -35,6 +35,7 @@ MonoBehaviour:
   - Flash
   - InstantiateRpc
   - Marco
+  - OnPlayerConnectRPC
   - PickupItemInit
   - Polo
   - PunPickup
@@ -43,7 +44,6 @@ MonoBehaviour:
   - RequestForPickupItems
   - RequestForPickupTimes
   - TaggedPlayer
-  - OnPlayerConnect
-  - OnPlayerConnectRPC
-  - Debugger
+  - RollDice
+  - YourTurn
   DisableAutoOpenWizard: 1
