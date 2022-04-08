@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class DiceRoller : Photon.MonoBehaviour
 {
+    ScoreTable myScoreTable;
+    ScoreTable enemyScoreTable;
     [SerializeField]
     GameObject[] diceObjectArray;
     [SerializeField]
@@ -22,16 +24,29 @@ public class DiceRoller : Photon.MonoBehaviour
     GameObject touchedObject;                   //터치를 위한 raycastHit
     bool nowChoosing;
     int rollCount;
+
     [SerializeField]
-    GameObject endRollButton;
+    Text[] myScoreTextArray;
+
     [SerializeField]
-    GameObject pickButton;
+    Text[] enemyScoreTextArray;
+    [SerializeField]
+    GameObject[] pickButtonArray;
 
     public void Start()
     {
+        myScoreTable = new ScoreTable();
+        enemyScoreTable = new ScoreTable();
         eyesArray = new int[diceObjectArray.Length];
         RollButtonActive(false);
-        
+        PickButtonActive(false);
+
+        for(int i = 0; i < enemyScoreTextArray.Length; i++)
+        {
+            enemyScoreTextArray[i].text = "0";
+            myScoreTextArray[i].text ="0";
+        }
+
         nowChoosedDiceIndex = new List<int>();
 
         for(int i = 0; i < diceObjectArray.Length; i++)
@@ -46,6 +61,7 @@ public class DiceRoller : Photon.MonoBehaviour
         RollButtonActive(myTurn);
         if(myTurn == true)
         {
+
             nowChoosing = false;
             rollCount = 3;
             myText.text = "남은 돌리기 : " + rollCount.ToString();
@@ -60,7 +76,9 @@ public class DiceRoller : Photon.MonoBehaviour
 
     public void MasterStart()
     {
-        photonView.RPC("YourTurn", PhotonTargets.Others);
+        myScoreTable = new ScoreTable();
+        string json = JsonUtility.ToJson(myScoreTable);
+        photonView.RPC("YourTurn", PhotonTargets.Others,json);
     }
 
     public void Update()
@@ -121,6 +139,7 @@ public class DiceRoller : Photon.MonoBehaviour
     public void RollMyDice()
     {
         nowChoosing = false;
+        PickButtonActive(false);
         RollButtonActive(false);
         int[] sendingDiceIndex = nowChoosedDiceIndex.ToArray();
         for (int i = 0; i < nowChoosedDiceIndex.Count; i++)
@@ -214,43 +233,215 @@ public class DiceRoller : Photon.MonoBehaviour
         if (isMyTurn == true)
         {
             SetDiceBeforeRoll();
+            PickButtonActive(true);
             rollCount--;
             myText.text = "남은 돌리기 : " + rollCount.ToString();
+
+            ChangeMyText();
             if (rollCount == 0)
             {
                 nowChoosing = false;
-                EndRoll();
             }
             else
             {
                 nowChoosing = true;
-                endRollButton.SetActive(true);
                 RollButtonActive(true);
 
             }
             //photonView.RPC("YourTurn", PhotonTargets.Others);
         }
+        else
+        {
+            ChangeEnemyText();
+        }
     }
 
-    public void EndRoll()
+    void ChangeMyText()
     {
-        endRollButton.SetActive(false);
-        pickButton.SetActive(true);
+        for(int i = 0; i < myScoreTextArray.Length; i++)
+        {
+            if ((ScoreKind)i == ScoreKind.Bonus)
+            {
+                int score = myScoreTable.OnScoreCalculate((ScoreKind)i, eyesArray);
+                if (score < 0)
+                {
+                    myScoreTextArray[i].color = Color.red;
+                }
+                else
+                {
+                    myScoreTextArray[i].color = Color.black;
+                }
+                myScoreTextArray[i].text = score.ToString();
+            }
+            else if ((ScoreKind)i == ScoreKind.TotalScore)
+            {
+                myScoreTextArray[i].text = myScoreTable.OnScoreCalculate((ScoreKind)i, eyesArray).ToString();
+            }
+            else if (myScoreTable.checkedScoreArray[i] == false)
+            {
+                myScoreTextArray[i].color = Color.green;
+                myScoreTextArray[i].text = myScoreTable.OnScoreCalculate((ScoreKind)i, eyesArray).ToString();
+            }
+            else
+            {
+                myScoreTextArray[i].color = Color.black;
+            }
+        }
+        
     }
 
-
-    public void PickScore()
+    void ChangeEnemyText()
     {
-        pickButton.SetActive(false);
+        for (int i = 0; i < enemyScoreTextArray.Length; i++)
+        {
+            if ((ScoreKind)i == ScoreKind.Bonus )
+            {
+                int score = enemyScoreTable.OnScoreCalculate((ScoreKind)i, eyesArray);
+                if (score < 0)
+                {
+                    enemyScoreTextArray[i].color = Color.red;
+                }
+                else
+                {
+                    enemyScoreTextArray[i].color = Color.black;
+                }
+                enemyScoreTextArray[i].text = score.ToString();
+            }
+            else if ((ScoreKind)i == ScoreKind.TotalScore)
+            {
+                enemyScoreTextArray[i].text = enemyScoreTable.OnScoreCalculate((ScoreKind)i, eyesArray).ToString();
+            }
+            else if (enemyScoreTable.checkedScoreArray[i] == false)
+            {
+                enemyScoreTextArray[i].color = Color.green;
+                enemyScoreTextArray[i].text = enemyScoreTable.OnScoreCalculate((ScoreKind)i, eyesArray).ToString();
+            }
+            else
+            {
+                enemyScoreTextArray[i].color = Color.black;
+            }
+        }
+
+    }
+
+    void BackToOriginMyText()
+    {
+        for (int i = 0; i < myScoreTextArray.Length; i++)
+        {
+            if ((ScoreKind)i == ScoreKind.Bonus)
+            {
+                int score = myScoreTable.OnScoreCalculate((ScoreKind)i, eyesArray);
+                if (score < 0)
+                {
+                    myScoreTextArray[i].color = Color.red;
+                }
+                else
+                {
+                    myScoreTextArray[i].color = Color.black;
+                }
+                myScoreTextArray[i].text = score.ToString();
+            }
+            else if ((ScoreKind)i == ScoreKind.TotalScore)
+            {
+                myScoreTextArray[i].text = myScoreTable.OnScoreCalculate((ScoreKind)i, eyesArray).ToString();
+            }
+            else if (myScoreTable.checkedScoreArray[i] == false)
+            {
+                myScoreTextArray[i].text = null;
+            }
+            else
+            {
+                myScoreTextArray[i].color = Color.black;
+                myScoreTextArray[i].text = myScoreTable.scoreArray[i].ToString();
+            }
+        }
+
+    }
+    void BackToOriginEnemyText()
+    {
+        for (int i = 0; i < enemyScoreTextArray.Length; i++)
+        {
+            if ((ScoreKind)i == ScoreKind.Bonus)
+            {
+                int score = enemyScoreTable.OnScoreCalculate((ScoreKind)i, eyesArray);
+                if (score < 0)
+                {
+                    enemyScoreTextArray[i].color = Color.red;
+                }
+                else
+                {
+                    enemyScoreTextArray[i].color = Color.black;
+                }
+                enemyScoreTextArray[i].text = score.ToString();
+            }
+            else if ((ScoreKind)i == ScoreKind.TotalScore)
+            {
+                enemyScoreTextArray[i].text = enemyScoreTable.OnScoreCalculate((ScoreKind)i, eyesArray).ToString();
+            }
+            else if (enemyScoreTable.checkedScoreArray[i] == false)
+            {
+                enemyScoreTextArray[i].text = null;
+            }
+            else
+            {
+                enemyScoreTextArray[i].color = Color.black;
+                enemyScoreTextArray[i].text = enemyScoreTable.scoreArray[i].ToString();
+            }
+        }
+
+    }
+
+    public void PickScore(int kindNum)
+    {
+        ScoreKind kind = (ScoreKind)kindNum;
+        PickButtonActive(false);
         TurnChange(false);
-        photonView.RPC("YourTurn", PhotonTargets.Others);
+        myScoreTable.OnScoreButton(kind, eyesArray);
+        BackToOriginMyText();
+        string json = JsonUtility.ToJson(myScoreTable);
+        photonView.RPC("YourTurn", PhotonTargets.Others, json);
     }
 
+    void PickButtonActive(bool active)
+    {
+        if (active==true)
+        {
+            for (int i = 0; i < pickButtonArray.Length; i++)
+            {
+                if (pickButtonArray[i] != null && myScoreTable.checkedScoreArray[i] == false)
+                {
+                    pickButtonArray[i].SetActive(true);
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < pickButtonArray.Length; i++)
+            {
+                if (pickButtonArray[i] != null)
+                {
+                    pickButtonArray[i].SetActive(false);
+                }
+            }
+        }
+
+        
+    }
 
 
     [PunRPC]
-    void YourTurn()
+    void YourTurn(string jsonEnemyTable)
     {
+        if(jsonEnemyTable == null)
+        {
+            enemyScoreTable = new ScoreTable();
+        }
+        else
+        {
+            ScoreTable enemyTable = JsonUtility.FromJson<ScoreTable>(jsonEnemyTable);
+            enemyScoreTable = enemyTable;
+        }
+        BackToOriginEnemyText();
         TurnChange(true);
     }
 

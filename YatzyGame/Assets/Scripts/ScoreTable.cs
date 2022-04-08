@@ -30,34 +30,62 @@ public class ScoreTable
 
     public void OnScoreButton(ScoreKind kind,int[] eyesArray)
     {
+        int pickedScore = 0;
         switch (kind)
         {
             case ScoreKind.Ones:
+               pickedScore= OnesCalculate(eyesArray);
                 break;
             case ScoreKind.Twos:
+                pickedScore = TwosCalculate(eyesArray);
                 break;
             case ScoreKind.Threes:
+                pickedScore = ThreesCalculate(eyesArray);
                 break;
             case ScoreKind.Fours:
+                pickedScore = FoursCalculate(eyesArray);
                 break;
             case ScoreKind.Fives:
+                pickedScore = FivesCalculate(eyesArray);
                 break;
             case ScoreKind.Sixes:
+                pickedScore = SixesCalculate(eyesArray);
                 break;
+
             case ScoreKind.ThreeKind:
+                pickedScore = ThreeKindCalculate(eyesArray);
                 break;
             case ScoreKind.FourKind:
+                pickedScore = FourKindCalculate(eyesArray);
                 break;
             case ScoreKind.FullHouse:
+                pickedScore = FullHouseCalculate(eyesArray);
                 break;
             case ScoreKind.SmallStraight:
+                pickedScore = SmallStraightCalculate(eyesArray);
                 break;
             case ScoreKind.LargeStraight:
+                pickedScore = LargeStraightCalculate(eyesArray);
                 break;
             case ScoreKind.Yahtzee:
+                pickedScore = YahtzeeCalculate(eyesArray);
                 break;
             case ScoreKind.Chance:
+                pickedScore = ChanceCalculate(eyesArray);
                 break;
+        }
+        if (pickedScore < 0)
+        {
+            pickedScore = 0;
+        }
+        checkedScoreArray[(int)kind] = true;
+        scoreArray[(int)kind] = pickedScore;
+        scoreArray[(int)ScoreKind.TotalScore] = TotalScoreCalculate();
+        if(BonusCalculate() > 0)
+        {
+            checkedScoreArray[(int)ScoreKind.Bonus] = true;
+            scoreArray[(int)ScoreKind.Bonus] = BonusCalculate();
+            scoreArray[(int)ScoreKind.TotalScore] = TotalScoreCalculate();
         }
     }
 
@@ -84,7 +112,7 @@ public class ScoreTable
                 return SixesCalculate(eyesArray);
 
             case ScoreKind.Bonus:
-                return BonusCalculate(eyesArray);
+                return BonusCalculate();
 
             case ScoreKind.TotalScore:
                 return TotalScoreCalculate();
@@ -114,7 +142,7 @@ public class ScoreTable
         return 0;
     }
 
-    public int OnesCalculate(int[] eyesArray)
+    int OnesCalculate(int[] eyesArray)
     {
         int sum = 0;
         for(int i = 0; i < eyesArray.Length; i++)
@@ -127,7 +155,7 @@ public class ScoreTable
         return sum;
     }
 
-    public int TwosCalculate(int[] eyesArray)
+    int TwosCalculate(int[] eyesArray)
     {
         int sum = 0;
         for (int i = 0; i < eyesArray.Length; i++)
@@ -140,7 +168,7 @@ public class ScoreTable
         return sum;
     }
 
-    public int ThreesCalculate(int[] eyesArray)
+    int ThreesCalculate(int[] eyesArray)
     {
         int sum = 0;
         for (int i = 0; i < eyesArray.Length; i++)
@@ -153,7 +181,7 @@ public class ScoreTable
         return sum;
     }
 
-    public int FoursCalculate(int[] eyesArray)
+    int FoursCalculate(int[] eyesArray)
     {
         int sum = 0;
         for (int i = 0; i < eyesArray.Length; i++)
@@ -166,7 +194,7 @@ public class ScoreTable
         return sum;
     }
 
-    public int FivesCalculate(int[] eyesArray)
+    int FivesCalculate(int[] eyesArray)
     {
         int sum = 0;
         for (int i = 0; i < eyesArray.Length; i++)
@@ -180,7 +208,7 @@ public class ScoreTable
     }
 
 
-    public int SixesCalculate(int[] eyesArray)
+    int SixesCalculate(int[] eyesArray)
     {
         int sum = 0;
         for (int i = 0; i < eyesArray.Length; i++)
@@ -193,7 +221,7 @@ public class ScoreTable
         return sum;
     }
 
-    public int BonusCalculate(int[] eyesArray)
+    int BonusCalculate()
     {
         int totalScore = TotalScoreCalculate();
         if(totalScore>= 63)
@@ -207,16 +235,17 @@ public class ScoreTable
 
     }
 
-    public int TotalScoreCalculate()
+    int TotalScoreCalculate()
     {
         int sum = 0;
         for(int i = 0; i < scoreArray.Length; i++)
         {
-            sum += scoreArray[i];
+            if(checkedScoreArray[i] == true)
+                sum += scoreArray[i];
         }
         return sum;
     }
-    public int ThreeKindCalculate(int[] eyesArray)
+    int ThreeKindCalculate(int[] eyesArray)
     {
         int[] eyesCount = new int[7];
         for (int i = 1; i < eyesCount.Length; i++)
@@ -236,7 +265,7 @@ public class ScoreTable
         }
         return 0;
     }
-    public int FourKindCalculate(int[] eyesArray)
+    int FourKindCalculate(int[] eyesArray)
     {
         int[] eyesCount = new int[7];
         for (int i = 1; i < eyesCount.Length; i++)
@@ -256,7 +285,7 @@ public class ScoreTable
         }
         return 0;
     }
-    public int FullHouseCalculate(int[] eyesArray)
+    int FullHouseCalculate(int[] eyesArray)
     {
         int[] eyesCount = new int[7];
         for (int i = 1; i < eyesCount.Length; i++)
@@ -286,7 +315,7 @@ public class ScoreTable
         }
         return 0;
     }
-    public int SmallStraightCalculate(int[] eyesArray)
+    int SmallStraightCalculate(int[] eyesArray)
     {
         int[] eyesCount = new int[7];
         for (int i = 1; i < eyesCount.Length; i++)
@@ -303,19 +332,19 @@ public class ScoreTable
             if (eyesCount[i] >= 1)
             {
                 counting++;
+                if (counting >= 4)
+                {
+                    return 30;
+                }
             }
             else
             {
                 counting = 0;
             }
         }
-        if(counting >= 4)
-        {
-            return 30;
-        }
         return 0;
     }
-    public int LargeStraightCalculate(int[] eyesArray)
+    int LargeStraightCalculate(int[] eyesArray)
     {
         int[] eyesCount = new int[7];
         for (int i = 1; i < eyesCount.Length; i++)
@@ -332,19 +361,20 @@ public class ScoreTable
             if (eyesCount[i] >= 1)
             {
                 counting++;
+                if (counting >= 5)
+                {
+                    return 40;
+                }
             }
             else
             {
                 counting = 0;
             }
         }
-        if (counting >= 5)
-        {
-            return 40;
-        }
+
         return 0;
     }
-    public int YahtzeeCalculate(int[] eyesArray)
+    int YahtzeeCalculate(int[] eyesArray)
     {
         int nowNum = eyesArray[0];
         for (int i = 1; i < eyesArray.Length; i++)
@@ -357,7 +387,7 @@ public class ScoreTable
         }
         return 50;
     }
-    public int ChanceCalculate(int[] eyesArray)
+    int ChanceCalculate(int[] eyesArray)
     {
         int sum = 0;
         for (int i = 0; i < eyesArray.Length; i++)
