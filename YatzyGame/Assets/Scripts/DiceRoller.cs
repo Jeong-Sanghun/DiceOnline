@@ -35,21 +35,26 @@ public class DiceRoller : Photon.MonoBehaviour
 
     public void Start()
     {
+        GameInit();
+    }
+
+    public void GameInit()
+    {
         myScoreTable = new ScoreTable();
         enemyScoreTable = new ScoreTable();
         eyesArray = new int[diceObjectArray.Length];
         RollButtonActive(false);
         PickButtonActive(false);
 
-        for(int i = 0; i < enemyScoreTextArray.Length; i++)
+        for (int i = 0; i < enemyScoreTextArray.Length; i++)
         {
-            enemyScoreTextArray[i].text = "0";
-            myScoreTextArray[i].text ="0";
+            enemyScoreTextArray[i].text = null;
+            myScoreTextArray[i].text = null;
         }
 
         nowChoosedDiceIndex = new List<int>();
 
-        for(int i = 0; i < diceObjectArray.Length; i++)
+        for (int i = 0; i < diceObjectArray.Length; i++)
         {
             diceObjectArray[i].transform.localEulerAngles = diceEyeAngle[Random.Range(1, 7)];
         }
@@ -424,8 +429,6 @@ public class DiceRoller : Photon.MonoBehaviour
                 }
             }
         }
-
-        
     }
 
 

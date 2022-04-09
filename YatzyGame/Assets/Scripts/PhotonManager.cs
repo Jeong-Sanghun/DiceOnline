@@ -8,7 +8,7 @@ public class PhotonManager : PunBehaviour
     public static PhotonManager singleton;
 
     GameSceneManager gameSceneManager;
-
+    bool isMyRoom;
     private void Awake()
     {
         if(singleton == null)
@@ -20,6 +20,10 @@ public class PhotonManager : PunBehaviour
         {
             Destroy(gameObject);
         }
+    }
+    private void Start()
+    {
+        isMyRoom = false;
     }
 
 
@@ -51,7 +55,7 @@ public class PhotonManager : PunBehaviour
         SceneLoadManager.singleton.LoadGameSceneAsync((task) =>
         {
             gameSceneManager = GameObject.Find("GameSceneManager").GetComponent<GameSceneManager>();
-            gameSceneManager.OnPlayerConnect();
+            gameSceneManager.OnMeJoin(isMyRoom);
         });
     }
 
@@ -59,12 +63,12 @@ public class PhotonManager : PunBehaviour
     {
         Debug.Log("들어가따!");
         //myPhotonView.RPC("OnPlayerConnectRPC", PhotonTargets.AllViaServer);
-        gameSceneManager.SetNickName();
+        gameSceneManager.OnOtherJoin(newPlayer);
     }
     public override void OnPhotonPlayerDisconnected(PhotonPlayer otherPlayer)
     {
         //myPhotonView.RPC("OnPlayerConnectRPC", PhotonTargets.AllViaServer);
-        gameSceneManager.SetNickName();
+        gameSceneManager.OnOtherDisconnect(otherPlayer);
     }
 
     public override void OnPhotonRandomJoinFailed(object[] codeAndMsg)
@@ -78,6 +82,7 @@ public class PhotonManager : PunBehaviour
     {
 
         Debug.Log(PhotonNetwork.inRoom + "룸이 만들어져따");
+        isMyRoom = true;
         //SceneLoadManager.singleton.LoadGameSceneAsync((task) =>
         //{
         //    GameObject.Find("GameSceneManager").GetComponent<GameSceneManager>().OnPlayerConnect();
@@ -89,12 +94,6 @@ public class PhotonManager : PunBehaviour
     {
         GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
         
-    }
-
-    [PunRPC]
-    void OnPlayerConnectRPC()
-    {
-        gameSceneManager.SetNickName();
     }
 
 }

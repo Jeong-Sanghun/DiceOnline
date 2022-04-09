@@ -9,7 +9,9 @@ public class GameSceneManager : UnityEngine.MonoBehaviour
     PhotonManager photonManager;
     SceneLoadManager sceneLoadManager;
     [SerializeField]
-    Text[] nickNameText;
+    Text myNickName;
+    [SerializeField]
+    Text enemyNickName;
 
     [SerializeField]
     DiceRoller diceRoller;
@@ -24,26 +26,21 @@ public class GameSceneManager : UnityEngine.MonoBehaviour
 
     }
 
-    public void OnPlayerConnect()
+    public void OnMeJoin(bool isNewRoom)
     {
         photonManager = PhotonManager.singleton;
         sceneLoadManager = SceneLoadManager.singleton;
         Debug.Log(PhotonNetwork.inRoom +" 인 룸");
-        // myPhotonView.RPC("OnPlayerConnectRPC", PhotonTargets.AllViaServer);
-        SetNickName();
-    }
-
-    public void SetNickName()
-    {
-        for (int i = 0; i < PhotonNetwork.room.PlayerCount; i++)
+        myNickName.text = PhotonNetwork.player.NickName;
+        if (!isNewRoom)
         {
-            nickNameText[i].text = PhotonNetwork.playerList[i].NickName;
-            
-        }
-        if (PhotonNetwork.countOfPlayers == 2)
-        {
-            //게임스타트
-            debugText.text = PhotonNetwork.player.NickName + " 입니당";
+            for(int i = 0; i < PhotonNetwork.room.PlayerCount; i++)
+            {
+                if(PhotonNetwork.playerList[i] != PhotonNetwork.player)
+                {
+                    enemyNickName.text = PhotonNetwork.playerList[i].NickName;
+                }
+            }
             if (PhotonNetwork.isMasterClient)
             {
                 diceRoller.TurnChange(true);
@@ -53,11 +50,29 @@ public class GameSceneManager : UnityEngine.MonoBehaviour
                 diceRoller.TurnChange(false);
                 diceRoller.MasterStart();
             }
-            
+
+        }
+        // myPhotonView.RPC("OnPlayerConnectRPC", PhotonTargets.AllViaServer);
+    }
+
+    public void OnOtherJoin(PhotonPlayer player)
+    {
+        enemyNickName.text = player.NickName;
+        if (PhotonNetwork.isMasterClient)
+        {
+            diceRoller.TurnChange(true);
         }
         else
         {
-            debugText.text = "아직 대기중이에요";
+            diceRoller.TurnChange(false);
+            diceRoller.MasterStart();
         }
+
+    }
+
+    public void OnOtherDisconnect(PhotonPlayer player)
+    {
+        diceRoller.GameInit();
+        enemyNickName.text = null;
     }
 }

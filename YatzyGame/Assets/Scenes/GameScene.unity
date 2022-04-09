@@ -3011,7 +3011,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: EnemyNick
+  m_Text: 
 --- !u!222 &503018901
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4071,9 +4071,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e6b63d2499403944ae035ee1b4f8c4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nickNameText:
-  - {fileID: 1450708374}
-  - {fileID: 503018900}
+  myNickName: {fileID: 1450708374}
+  enemyNickName: {fileID: 503018900}
   diceRoller: {fileID: 1506697506}
   debugText: {fileID: 1292335650}
 --- !u!4 &678914962
@@ -9419,7 +9418,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: MyNick
+  m_Text: 
 --- !u!1 &1461669831
 GameObject:
   m_ObjectHideFlags: 0
@@ -9808,7 +9807,6 @@ MonoBehaviour:
   cam: {fileID: 2066825222}
   rollButton: {fileID: 595360473}
   myText: {fileID: 1292335650}
-  pickButton: {fileID: 1660379534}
   myScoreTextArray:
   - {fileID: 1531646279}
   - {fileID: 393836546}
